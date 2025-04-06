@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import Plate from '../../assets/home-page/plate.png'
-import PlateA from '../../assets/home-page/plateA.png'
+import PlateA from '../../assets/home-page/PlateA.png'
 
 const roundIcons = [Plate, Plate, Plate, Plate, Plate, Plate, Plate, Plate]
 
