@@ -1,14 +1,36 @@
+import { useState, useEffect } from 'react'
 import Plate from '../../assets/home-page/plate.png'
+import PlateA from '../../assets/home-page/plateA.png'
 
 const roundIcons = [Plate, Plate, Plate, Plate, Plate, Plate, Plate, Plate]
 
-export default function Hero() {
+export default function HeroSection() {
+  const [distance, setDistance] = useState(135);
+  const [currentPlate, setCurrentPlate] = useState(Plate);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentPlate(prev => (prev === Plate ? PlateA : Plate));
+    }, 1800);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setDistance(window.innerWidth >= 768 ? 200 : 135); // Tailwind's md = 768px
+    };
+
+    handleResize(); 
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Hero Section */}
-      <div className="grid md:grid-cols-2 gap-8 mb-20">
+      <div className="grid md:grid-cols-2 gap-8 sm:gap-2 mb-20">
         <div className="flex flex-col justify-center">
-          <h1 className="text-5xl font-bold mb-6 leading-tight">
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
             <span className="text-[#FF5733]">Food</span> is a powerful way to change lives.
           </h1>
           <p className="text-gray-600 mb-8 max-w-md">
@@ -25,17 +47,17 @@ export default function Hero() {
         </div>
 
         <div className="relative">
-          <div className="relative w-full h-[400px] flex items-center justify-center">
+          <div className="relative w-full h-[500px] max-w-screen overflow-hidden  flex items-center justify-center">
             {/* Main dish image */}
             <div className="w-28 h-28 rounded-full items-center justify-center">
               <img
-                src={Plate}
+                src={currentPlate}
                 className="w-full h-full object-cover rounded-full"
               />
             </div>
 
             {/* Circular food items */}
-            <div className="absolute w-[360px] h-[360px] animate-[var(--animation-spin-slow)]">
+            <div className="absolute max-w-screen w-[270px] h-[270px] md:w-[400px] md:h-[400px] animate-[spin_10s_linear_infinite]">
               <div className="absolute inset-0 border-2 border-dashed border-[#FF5733] rounded-full"></div>
               {roundIcons.map((icon, index) => {
                 const angle = (index / roundIcons.length) * 360;
@@ -44,12 +66,12 @@ export default function Hero() {
                     key={index}
                     className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2"
                     style={{
-                      transform: `rotate(${angle}deg) translate(180px) rotate(-${angle}deg)`
+                      transform: `rotate(${angle}deg) translate(${distance}px) rotate(-${angle}deg)`
                     }}
                   >
-                    <div className="w-12 h-12 rounded-full items-center justify-center">
+                    <div className="w-18 h-18 rounded-full items-center justify-center">
                       <img
-                        src={Plate}
+                        src={icon}
                         className="w-full h-full object-cover rounded-full"
                       />
                     </div>
@@ -63,4 +85,3 @@ export default function Hero() {
     </div>
   )
 }
-

@@ -1,11 +1,8 @@
 @import "tailwindcss";
 
-:root {
-  --animation-spin-slow: spin 13s linear infinite;
-}
 
 html {
-  font-family: "Inter", sans-serif;
+  font-family: "Poppins", sans-serif;
   font-optical-sizing: auto;
   font-weight: 400;
   font-style: normal;
