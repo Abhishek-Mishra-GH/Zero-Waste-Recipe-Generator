@@ -66,12 +66,6 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <div className="my-6 flex items-center">
-          <div className="flex-grow h-px bg-gray-300"></div>
-          <span className="px-4 text-gray-500 text-sm">OR</span>
-          <div className="flex-grow h-px bg-gray-300"></div>
-        </div>
-
         {/* <button
           type="button"
           className="w-full flex items-center justify-center border border-orange-400 text-orange-500 font-medium py-3 px-4 rounded-md hover:bg-orange-50 transition-colors"
