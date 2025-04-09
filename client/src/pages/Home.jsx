@@ -3,6 +3,7 @@ import FaqsSection from "../components/sections/FaqsSection"
 import FeaturesSection from "../components/sections/FeaturesSection"
 import GuideSection from "../components/sections/GuideSection"
 import HeroSection from "../components/sections/HeroSection"
+import PopularRecipesSection from "../components/sections/PopularRecipesSection"
 import TestimonialsSection from "../components/sections/TestimonialsSection"
 
 
@@ -14,6 +15,7 @@ export default function Home() {
       <FeaturesSection />
       <GuideSection />
       <FaqsSection />
+      <PopularRecipesSection />
       <TestimonialsSection />
     </main>
   )

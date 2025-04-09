@@ -1,15 +1,16 @@
-
+import FoodCollage from '../../assets/home-page/collage.png'
 
 export default function AboutSection() {
   return (
-    <section className="w-full py-12 px-4 md:px-8">
+    <section id="about" className="w-full py-12 px-4 md:px-8 mb-16">
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-8">
         <div className="md:w-1/2 flex items-center justify-center">
           <img
-            src="/placeholder.svg?height=400&width=400"
+            src={FoodCollage}
             alt="Food platform illustration"
-            width={400}
-            height={400}
+            width={450}
+            height={450}
+
             className="rounded-lg shadow-md"
           />
         </div>

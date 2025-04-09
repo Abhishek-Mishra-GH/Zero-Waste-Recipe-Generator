@@ -25,7 +25,7 @@ export default function GuideSection() {
   ]
 
   return (
-    <section className="w-full bg-white/15 py-12 px-4 md:px-8" style={{backgroundImage: `url(${BgFood})`}}>
+    <section id="guide" className="w-full bg-white/15 py-12 px-4 md:px-8" style={{backgroundImage: `url(${BgFood})`}}>
       <div className="max-w-6xl mx-auto">
         <h2 className="text-center text-orange-500 text-3xl font-bold mb-12">GUIDE</h2>
 

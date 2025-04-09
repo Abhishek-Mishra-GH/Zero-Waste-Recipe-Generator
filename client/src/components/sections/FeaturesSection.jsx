@@ -74,7 +74,7 @@ export default function FeaturesSection() {
   }
 
   return (
-    <section className="w-full bg-orange-500 py-8 px-9 relative">
+    <section id="features" className="w-full bg-orange-500 py-8 px-9 relative">
       <button
         onClick={prevSlide}
         disabled={currentIndex === 0}

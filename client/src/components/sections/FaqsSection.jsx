@@ -34,6 +34,7 @@ export default function FaqsSection() {
 
   return (
     <section
+      id="faqs"
       className="w-full py-16 md:py-24 px-4 md:px-8 relative"
       style={{
         backgroundImage: `url(${BgFood2})`,
