@@ -6,6 +6,7 @@ const register = async (req, res) => {
     res.status(201).json(user);
   } catch (err) {
     res.status(400).json({ error: err.message });
+    console.error(err.message);
   }
 };
 

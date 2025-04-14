@@ -1,12 +1,15 @@
 import { useState } from "react"
 import { LuArrowLeft, LuUpload, LuLoader } from "react-icons/lu"
 import axios from "axios"
+import ImageUpload from "../shared/ImageUpload"
 
 export default function UserBusinessForm({ onBack }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitSuccess, setSubmitSuccess] = useState(false)
   const [submitError, setSubmitError] = useState("")
   const [isBusiness, setIsBusiness] = useState(false)
+  const [agreeTerms, setAgreeTerms] = useState(false)
+  const [image, setImage] = useState(null);
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -24,10 +27,10 @@ export default function UserBusinessForm({ onBack }) {
     contactDesignation: "",
     contactPhone: "",
     businessEmail: "",
-    fssaiCertificate: null,
-    addressProof: null,
-    safetyAudit: null,
-    agreeTerms: false,
+    fssaiCertificate: "",
+    addressProof: "",
+    safetyAudit: "",
+    role: "USER",
   })
 
   const [errors, setErrors] = useState({})
@@ -43,12 +46,33 @@ export default function UserBusinessForm({ onBack }) {
     }
   }
 
-  const handleFileChange = (e) => {
-    const { name, files } = e.target
-    if (files && files.length > 0) {
-      setFormData({ ...formData, [name]: files[0] })
-    }
-  }
+  // const handleFileChange = (e) => {
+  //   const { name, files } = e.target
+  //   if (files && files.length > 0) {
+  //     setImages({ ...images, [name]: files[0] })
+  //   }
+  // }
+
+  // const handleImageUpload = async (e) => {
+  //   const imageFormData = new FormData()
+  //   if(images.fssaiCertificate) {
+  //     imageFormData.append("fssaiCertificate", images.fssaiCertificate)
+  //   }
+
+  //   try {
+  //     const res = await axios.post("http://localhost:5000/api/upload", imageFormData, {
+  //       headers: {
+  //         "Content-Type": "multipart/form-data",
+  //       },
+  //     })
+
+  //     const imageUrl = res.data.fileUrl;
+  //     setFormData((prevData) => ({ ...prevData, fssaiCertificate: imageUrl }))
+
+  //   } catch (error) {
+  //     console.error("Error uploading image:", error)
+  //   }
+  // }
 
   const validateForm = () => {
     const newErrors = {}
@@ -70,15 +94,18 @@ export default function UserBusinessForm({ onBack }) {
 
     // Business validation
     if (isBusiness) {
+
       if (!formData.businessName.trim()) newErrors.businessName = "Business name is required"
       if (!formData.businessType) newErrors.businessType = "Business type is required"
       if (!formData.fssaiNumber.trim()) newErrors.fssaiNumber = "FSSAI license number is required"
       if (!formData.contactPersonName.trim()) newErrors.contactPersonName = "Contact person name is required"
     }
 
-    if (!formData.agreeTerms) {
+    if (!agreeTerms) {
       newErrors.agreeTerms = "You must agree to the terms and conditions"
     }
+
+    setFormData((prevData) => ({ ...prevData, role: "BUSINESS" }))
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -92,28 +119,16 @@ export default function UserBusinessForm({ onBack }) {
     setIsSubmitting(true)
     setSubmitError("")
 
-    // Create FormData for file uploads
-    const submitData = new FormData()
-
-    // Add all form fields to FormData
-    Object.entries(formData).forEach(([key, value]) => {
-      if (value !== null) {
-        if (value instanceof File) {
-          submitData.append(key, value)
-        } else {
-          submitData.append(key, String(value))
-        }
-      }
-    })
-
-    // Add isBusiness flag
-    submitData.append("isBusiness", String(isBusiness))
+    const userData = {...formData}
+    delete userData.confirmPassword
 
     try {
       // In a real app, replace with your actual API endpoint
-      const response = await axios.post("https://api.example.com/register/user", submitData, {
+      const url = `${import.meta.env.VITE_BACKEND}/auth/register`
+      const response = await axios.post(url, userData, {
         headers: {
-          "Content-Type": "multipart/form-data",
+          "Content-Type": "application/json",
+          "Accept": "application/json",
         },
       })
 
@@ -122,7 +137,7 @@ export default function UserBusinessForm({ onBack }) {
 
       // In a real app, you might redirect the user or show a success message
     } catch (error) {
-      console.error("Registration failed:", error)
+      console.error("Registration failed:", error.message)
       setSubmitError("Registration failed. Please try again later.")
     } finally {
       setIsSubmitting(false)
@@ -437,67 +452,9 @@ export default function UserBusinessForm({ onBack }) {
               </div>
 
               <h4 className="text-md font-medium mt-4 mb-3">Document Upload</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="fssaiCertificate" className="block text-sm font-medium text-gray-700 mb-1">
-                    Upload FSSAI Certificate (PDF or Image) *
-                  </label>
-                  <div className="flex items-center mt-1">
-                    <label className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer">
-                      <LuUpload className="mr-2" />
-                      {formData.fssaiCertificate ? formData.fssaiCertificate.name : "Choose file"}
-                      <input
-                        type="file"
-                        id="fssaiCertificate"
-                        name="fssaiCertificate"
-                        onChange={handleFileChange}
-                        accept=".pdf,.jpg,.jpeg,.png"
-                        className="sr-only"
-                      />
-                    </label>
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="addressProof" className="block text-sm font-medium text-gray-700 mb-1">
-                    Upload Business Address Proof (PDF/Image) *
-                  </label>
-                  <div className="flex items-center mt-1">
-                    <label className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer">
-                      <LuUpload className="mr-2" />
-                      {formData.addressProof ? formData.addressProof.name : "Choose file"}
-                      <input
-                        type="file"
-                        id="addressProof"
-                        name="addressProof"
-                        onChange={handleFileChange}
-                        accept=".pdf,.jpg,.jpeg,.png"
-                        className="sr-only"
-                      />
-                    </label>
-                  </div>
-                </div>
-
-                <div className="md:col-span-2">
-                  <label htmlFor="safetyAudit" className="block text-sm font-medium text-gray-700 mb-1">
-                    Upload Recent Food Safety Audit (optional)
-                  </label>
-                  <div className="flex items-center mt-1">
-                    <label className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer">
-                      <LuUpload className="mr-2" />
-                      {formData.safetyAudit ? formData.safetyAudit.name : "Choose file"}
-                      <input
-                        type="file"
-                        id="safetyAudit"
-                        name="safetyAudit"
-                        onChange={handleFileChange}
-                        accept=".pdf,.jpg,.jpeg,.png"
-                        className="sr-only"
-                      />
-                    </label>
-                  </div>
-                </div>
-              </div>
+              <ImageUpload title={"Upload FSSAI Certificate (Image) *"} onUpload={(imageUrl) => {
+                setFormData((prevData) => ({ ...prevData, fssaiCertificate: imageUrl }))
+              }}/>
             </div>
           )}
 
@@ -508,8 +465,8 @@ export default function UserBusinessForm({ onBack }) {
                 id="agreeTerms"
                 name="agreeTerms"
                 type="checkbox"
-                checked={formData.agreeTerms}
-                onChange={handleInputChange}
+                checked={agreeTerms}
+                onChange={(e) => setAgreeTerms(e.target.checked)}
                 className="focus:ring-orange-500 h-4 w-4 text-orange-600 border-gray-300 rounded"
               />
             </div>
@@ -526,7 +483,7 @@ export default function UserBusinessForm({ onBack }) {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-6 rounded-md transition-colors flex items-center"
+              className="bg-orange-500 w-full  hover:bg-orange-600 text-white font-medium py-2 px-6 rounded-md transition-colors flex justify-center items-center"
             >
               {isSubmitting ? (
                 <>

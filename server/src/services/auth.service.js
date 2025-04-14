@@ -2,27 +2,22 @@ const prisma = require('../../prisma/client');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const registerUser = async ({ name, email, password, role, fssaiCertificate }) => {
-  const existingUser = await prisma.user.findUnique({ where: { email } });
+const registerUser = async (user) => {
+  const existingUser = await prisma.user.findUnique({ where: { email: user.email } });
+
   if (existingUser) throw new Error('Email already registered');
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = await bcrypt.hash(user.password, 10);
 
   const newUser = await prisma.user.create({
     data: {
-      name,
-      email,
+      ...user,
       password: hashedPassword,
-      role,
-      fssaiCert: role === 'RESTAURANT' ? fssaiCertificate : null
-    }
+    },
   });
 
   return {
-    id: newUser.id,
-    email: newUser.email,
-    role: newUser.role,
-    message: 'Registration successful',
+    ...newUser,
   };
 };
 

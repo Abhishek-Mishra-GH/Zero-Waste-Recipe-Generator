@@ -7,7 +7,7 @@ const uploadRoutes = require('./upload.routes');
 const recipeRoutes = require('./recipe.routes');
 
 router.use('/auth', authRoutes);
-router.use('/uploads', uploadRoutes);
+router.use('/upload', uploadRoutes);
 router.use('/recipe', recipeRoutes);
 
 module.exports = router;
