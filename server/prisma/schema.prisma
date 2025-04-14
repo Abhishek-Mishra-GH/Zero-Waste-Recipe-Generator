@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String     @id @default(uuid())
+  name       String
+  email      String     @unique
+  password   String
+  role       Role
+  fssaiCert  String? // Only for restaurant
+  recipes    Recipe[]
+  donations  Donation[]
+  mealPlans  MealPlan[]
+  hasDonated Boolean    @default(false)
+  createdAt  DateTime   @default(now())
+}
+
+model NGO {
+  id                String     @id @default(uuid())
+  name              String
+  email             String     @unique
+  password          String
+  acceptedDonations Donation[]
+  createdAt         DateTime   @default(now())
+}
+
+model Donation {
+  id                String   @id @default(uuid())
+  userId            String
+  ngoId             String?
+  foodItems         String
+  foodCategory      String
+  quantity          String
+  expiryDate        DateTime
+  pickupLocation    String
+  pickupTimes       String
+  contactPhone      String
+  additionalDetails String?
+  hasAllergens      Boolean  @default(false)
+  imageUrls         String[]
+  status            String   @default("pending")
+  createdAt         DateTime @default(now())
+  ngo               NGO?     @relation(fields: [ngoId], references: [id])
+  user              User     @relation(fields: [userId], references: [id])
+}
+
+model Recipe {
+  id        String   @id @default(uuid())
+  recipe    String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model MealPlan {
+  id        String     @id @default(uuid())
+  user      User       @relation(fields: [userId], references: [id])
+  userId    String
+  item      String
+  status    MealStatus
+  expiry    DateTime
+  createdAt DateTime   @default(now())
+}
+
+enum Role {
+  HOUSEHOLD
+  RESTAURANT
+}
+
+enum MealStatus {
+  GREEN
+  YELLOW
+  RED
+}
+
+enum DonationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}

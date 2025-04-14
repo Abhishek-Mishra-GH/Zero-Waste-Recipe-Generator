@@ -1,7 +1,56 @@
+import axios from "axios"
 import { useState } from "react"
+import Loader from "../components/shared/Loader"
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
+  const [loading, setLoading] = useState(false)
+
+  const handleLogin = async (e) => {
+    setLoading(true)
+    setError("")
+    e.preventDefault()
+    setError("")
+
+    if (email === "" || password === "") {
+      setError("Please fill in all fields.")
+      return
+    }
+
+    try {
+      const res = await axios.post(`${import.meta.env.VITE_BACKEND}/auth/login`, {email, password});
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+      if(res.data.user.role === "NGO") {
+        window.location.href = "/ngodashboard"
+      } else {
+        window.location.href = "/dashboard"
+      }
+    } catch (err) {
+      console.error(err)
+      if (err.response && err.response.status === 401) {
+        setError("Invalid email or password.")
+      } else if (err.response && err.response.status === 500) {
+        setError("Server error. Please try again later.")
+      } else {
+        setError("Network error. Please check your connection.")
+      }
+
+    } finally {
+      setLoading(false)
+    }
+    
+  }
+
+  if (loading) {
+    return (
+      <Loader />
+    )
+  }
+  
 
   return (
     <div
@@ -18,11 +67,13 @@ export default function LoginPage() {
         <form>
           <div className="mb-4">
             <label htmlFor="email" className="block text-gray-700 mb-2">
-              Email or username
+              Email
             </label>
             <input
               type="text"
               id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-3 rounded-md bg-orange-200 border-0 focus:ring-2 focus:ring-orange-300"
               required
             />
@@ -35,6 +86,8 @@ export default function LoginPage() {
             <input
               type={showPassword ? "text" : "password"}
               id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-3 rounded-md bg-orange-200 border-0 focus:ring-2 focus:ring-orange-300"
               required
             />
@@ -60,17 +113,19 @@ export default function LoginPage() {
 
           <button
             type="submit"
+            onClick={handleLogin}
             className="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium py-3 px-4 rounded-md transition-colors"
           >
             Log In
           </button>
+          {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
         </form>
 
         {/* <button
           type="button"
           className="w-full flex items-center justify-center border border-orange-400 text-orange-500 font-medium py-3 px-4 rounded-md hover:bg-orange-50 transition-colors"
         >
-          <LuGoogle className="mr-2" />
+          
           Continue with Google
         </button> */}
 

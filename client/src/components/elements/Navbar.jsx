@@ -3,6 +3,8 @@ import { Link } from "react-router";
 
 
 export default function Navbar() {
+  const isLoggedIn = localStorage.getItem("token") !== null;
+  const user = JSON.parse(localStorage.getItem("user"));
 
   return <header className="flex items-center max-w-7xl mx-auto justify-between py-4 px-4 md:px-8 shadow-[0_6px_3px_-3px_rgba(0,0,0,0.1)]">
 
@@ -27,8 +29,14 @@ export default function Navbar() {
       </a>
     </nav>
 
-    <Link to="/login">
-      <button className="px-8 py-2 rounded-full bg-orange-500 text-white cursor-pointer">Login</button>
-    </Link>
+    {isLoggedIn ? (
+      <Link to={user.role === "NGO" ? "/ngodashboard" : "/dashboard"}>
+        <button className="px-4 py-2 rounded-full bg-orange-500 text-white cursor-pointer">Dashboard</button>
+      </Link>
+    ) : (
+      <Link to="/login">
+        <button className="px-8 py-2 rounded-full bg-orange-500 text-white cursor-pointer">Login</button>
+      </Link>
+    )}
   </header>
 }
