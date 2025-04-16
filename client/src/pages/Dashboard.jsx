@@ -62,7 +62,12 @@ export default function Dashboard() {
               </li>
             ))}
             <li>
-              <button className="flex items-center w-full px-4 py-3 text-left text-gray-700 transition-colors hover:text-red-700">
+              <button onClick={() => {
+                // remove localstorage and redirect to login page
+                localStorage.removeItem("token")
+                localStorage.removeItem("role")
+                window.location.href = "/login"
+              }} className="flex items-center w-full px-4 py-3 text-left text-gray-700 transition-colors hover:text-red-700">
                 <span className="mr-3">
                   <LuLogOut className="w-5 h-5" />
                 </span>

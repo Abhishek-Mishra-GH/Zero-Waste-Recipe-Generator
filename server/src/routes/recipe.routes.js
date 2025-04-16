@@ -6,6 +6,31 @@ require("dotenv").config();
 const prisma = require("../../prisma/client");
 const authenticateToken = require("../middlewares/auth.middleware");
 
+router.get("/:id", async (req, res) => {
+  const id = req.params.id;
+  if (!id) {
+    return res.status(400).json({ error: "Recipe ID is required" });
+  }
+
+  try {
+    const recipe = await prisma.recipe.findUnique({
+      where: { id },
+      orderBy: { createdAt: "desc" },
+    });
+
+    if (!recipe) {
+      return res.status(404).json({ error: "Recipe not found" });
+    }
+
+    res.status(200).json(JSON.parse(recipe));
+  } catch (err) {
+    console.error(err.message);
+    return res.status(500).json({ error: "Failed to fetch recipe" });
+  }
+
+
+})
+
 router.get("/user-recipes", (req, res) => {
   const userid = req.query.id;
   if (!userId) {

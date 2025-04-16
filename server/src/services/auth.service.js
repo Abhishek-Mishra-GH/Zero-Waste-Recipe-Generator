@@ -22,7 +22,12 @@ const registerUser = async (user) => {
 };
 
 const loginUser = async ({ email, password }) => {
-  const user = await prisma.user.findUnique({ where: { email } });
+  let user = await prisma.user.findUnique({ where: { email } });
+
+  if(!user) {
+    user = await prisma.ngo.findUnique({ where: { email } });
+  }
+
   if (!user) throw new Error('User not found');
 
   const isMatch = await bcrypt.compare(password, user.password);

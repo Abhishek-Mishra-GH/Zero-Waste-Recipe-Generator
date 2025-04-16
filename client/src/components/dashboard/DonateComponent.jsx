@@ -1,5 +1,8 @@
 import { useState } from "react"
 import { LuMapPin, LuCalendar, LuAward, LuPlus, LuImage, LuClock, LuCheck, LuX } from "react-icons/lu"
+import ImageUpload from "../shared/ImageUpload"
+import axios from "axios"
+import Loader from "../shared/Loader"
 
 export default function DonateComponent() {
   const [activeTab, setActiveTab] = useState("donate")
@@ -50,18 +53,20 @@ export default function DonateComponent() {
       rejectionReason: "Packaging damaged",
     },
   ])
+  const [loading, setLoading] = useState(false)
 
   const [newDonation, setNewDonation] = useState({
-    foodType: "",
+    foodItems: "",
+    foodCategory: "Non-perishable",
     quantity: "",
     expiry: "",
     location: "",
     description: "",
     contactPhone: "",
     pickupTimes: "",
-    foodCategory: "Non-perishable",
-    hasAllergies: false,
+    hasAllergens: false,
     allergyInfo: "",
+    foodImage: "",
   })
 
   const handleInputChange = (e) => {
@@ -72,40 +77,85 @@ export default function DonateComponent() {
     })
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
+    setLoading(true)
 
-    // In a real app, this would send the data to an API
-    const newDonationEntry = {
-      id: donationHistory.length + 1,
-      date: new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }),
-      organization: "Pending Assignment",
-      items: [newDonation.foodType],
-      quantity: newDonation.quantity,
-      expiry: newDonation.expiry,
-      location: newDonation.location,
-      status: "pending",
-      certificate: false,
+    // Validate form data
+    if (!newDonation.foodItems || !newDonation.quantity || !newDonation.expiry || !newDonation.location) {
+      alert("Please fill in all required fields.")
+      setLoading(false)
+      return
+    }
+    if (newDonation.hasAllergens && !newDonation.allergyInfo) {
+      alert("Please specify allergens if you checked the allergies box.")
+      setLoading(false)
+      return
+    }
+    if (!newDonation.foodImage) {
+      alert("Please upload an image of the food items.")
+      setLoading(false)
+      return
     }
 
-    setDonationHistory([newDonationEntry, ...donationHistory])
+    if (!newDonation.contactPhone || !newDonation.pickupTimes) {
+      alert("Please provide your contact phone number and available pickup times.")
+      setLoading(false)
+      return
+    }
 
-    // Reset form
-    setNewDonation({
-      foodType: "",
-      quantity: "",
-      expiry: "",
-      location: "",
-      description: "",
-      contactPhone: "",
-      pickupTimes: "",
-      foodCategory: "Non-perishable",
-      hasAllergies: false,
-      allergyInfo: "",
-    })
+    if (newDonation.contactPhone.length < 10) {
+      alert("Please provide a valid phone number.")
+      setLoading(false)
+      return
+    }
 
-    // Switch to history tab to show the new donation
-    setActiveTab("history")
+
+
+    try {
+      const url = `${import.meta.env.VITE_BACKEND}/donation`
+      const res = await axios.post(url, newDonation, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+
+      const newDonationEntry = {
+        id: donationHistory.length + 1,
+        date: new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }),
+        organization: "Pending Assignment",
+        items: [newDonation.foodItems],
+        quantity: newDonation.quantity,
+        expiry: newDonation.expiry,
+        location: newDonation.location,
+        status: "pending",
+        certificate: false,
+      }
+
+      setDonationHistory([newDonationEntry, ...donationHistory])
+
+      setNewDonation({
+        foodItems: "",
+        quantity: "",
+        expiry: "",
+        location: "",
+        description: "",
+        contactPhone: "",
+        pickupTimes: "",
+        foodCategory: "Non-perishable",
+        hasAllergens: false,
+        allergyInfo: "",
+        foodImage: "",
+      })
+
+      setActiveTab("history")
+    } catch {
+      alert("An error occurred while processing your donation. Please try again.")
+      return
+    } finally {
+      setLoading(false)
+    }
   }
 
   const getStatusBadge = (status) => {
@@ -131,6 +181,14 @@ export default function DonateComponent() {
       default:
         return null
     }
+  }
+
+  if(loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader />
+      </div>
+    )
   }
 
   return (
@@ -172,14 +230,14 @@ export default function DonateComponent() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label htmlFor="foodType" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label htmlFor="foodItems" className="block text-sm font-medium text-gray-700 mb-1">
                     Food Item(s) *
                   </label>
                   <input
                     type="text"
-                    id="foodType"
-                    name="foodType"
-                    value={newDonation.foodType}
+                    id="foodItems"
+                    name="foodItems"
+                    value={newDonation.foodItems}
                     onChange={handleInputChange}
                     placeholder="E.g., Rice, Pasta, Canned Beans"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md"
@@ -307,18 +365,18 @@ export default function DonateComponent() {
                   <div className="flex items-center mb-2">
                     <input
                       type="checkbox"
-                      id="hasAllergies"
-                      name="hasAllergies"
-                      checked={newDonation.hasAllergies}
+                      id="hasAllergens"
+                      name="hasAllergens"
+                      checked={newDonation.hasAllergens}
                       onChange={handleInputChange}
                       className="mr-2"
                     />
-                    <label htmlFor="hasAllergies" className="text-sm font-medium text-gray-700">
+                    <label htmlFor="hasAllergens" className="text-sm font-medium text-gray-700">
                       Contains potential allergens
                     </label>
                   </div>
 
-                  {newDonation.hasAllergies && (
+                  {newDonation.hasAllergens && (
                     <input
                       type="text"
                       id="allergyInfo"
@@ -331,21 +389,7 @@ export default function DonateComponent() {
                   )}
                 </div>
 
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Upload Images (Optional)</label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-md p-6 flex flex-col items-center">
-                    <LuImage className="w-8 h-8 text-gray-400 mb-2" />
-                    <p className="text-sm text-gray-500 mb-1">Drag and drop images here, or click to select files</p>
-                    <p className="text-xs text-gray-400">Maximum 3 images, 5MB each</p>
-                    <input type="file" className="hidden" accept="image/*" multiple />
-                    <button
-                      type="button"
-                      className="mt-4 px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
-                    >
-                      Select Files
-                    </button>
-                  </div>
-                </div>
+                <ImageUpload title={"Food Image*"} onUpload={(url) => setNewDonation({ ...newDonation, foodImage: url })} />
               </div>
 
               <div className="border-t pt-6 flex justify-end">

@@ -50,15 +50,6 @@ export default function RegisterPage() {
         ) : (
           <NgoForm onBack={() => setSelectedType(null)} />
         )}
-
-        <div className="text-center mt-6">
-          <p className="text-gray-600">
-            Already have an account?{" "}
-            <a href="/login" className="text-orange-500 hover:text-orange-600 font-medium">
-              Log in
-            </a>
-          </p>
-        </div>
       </div>
     </div>
   )

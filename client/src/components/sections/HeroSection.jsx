@@ -37,11 +37,26 @@ export default function HeroSection() {
             We are dedicated to making food donations easier than ever, connecting you with NGOs and those in need. Join us in the mission to reduce food waste and make a difference.
           </p>
           <div className="flex space-x-4">
-            <button className="bg-[#FF5733] text-white px-6 py-3 rounded-md font-medium hover:bg-[#E64A19] transition-colors">
+            <button onClick={() => {
+              // if not logged in, redirect to login page
+              const token = localStorage.getItem('token');
+              if (!token) {
+                window.location.href = '/login';
+                return;
+              }
+
+              if(window.localStorage.getItem('role') === 'NGO') {
+                alert('You are logged in as an NGO. Please login as a user to donate.');
+              }
+              // if logged in, redirect to donate page
+              window.location.href = '/dashboard';
+            }} className="bg-[#FF5733] hover:cursor-pointer text-white px-6 py-3 rounded-md font-medium hover:bg-[#E64A19] transition-colors">
               Donate Now
             </button>
-            <button className="bg-[#7CB342] text-white px-6 py-3 rounded-md font-medium hover:bg-[#689F38] transition-colors">
-              Learn More
+            <button onClick={() => {
+              window.location.href = '/register'
+            }} className="bg-[#7CB342] hover:cursor-pointer text-white px-6 py-3 rounded-md font-medium hover:bg-[#689F38] transition-colors">
+              Register
             </button>
           </div>
         </div>

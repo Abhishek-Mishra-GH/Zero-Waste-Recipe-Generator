@@ -25,12 +25,14 @@ export default function LoginPage() {
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
       if(res.data.user.role === "NGO") {
+        localStorage.setItem("role", "NGO")
         window.location.href = "/ngodashboard"
       } else {
+        localStorage.setItem("role", "USER")
         window.location.href = "/dashboard"
       }
     } catch (err) {
-      console.error(err)
+      console.error(err.message)
       if (err.response && err.response.status === 401) {
         setError("Invalid email or password.")
       } else if (err.response && err.response.status === 500) {

@@ -1,11 +1,14 @@
 import { useState } from "react"
 import { LuArrowLeft, LuUpload, LuLoader } from "react-icons/lu"
 import axios from "axios"
+import ImageUpload from "../shared/ImageUpload"
+import Loader from "../shared/Loader"
 
 export default function NgoForm({ onBack }) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitSuccess, setSubmitSuccess] = useState(false)
   const [submitError, setSubmitError] = useState("")
+  const [loading ,setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     // Organization Information
@@ -15,9 +18,11 @@ export default function NgoForm({ onBack }) {
     yearEstablished: "",
     website: "",
 
+
     // Authorized Person Details
     fullName: "",
     email: "",
+    password: "",
     phone: "",
     alternatePhone: "",
     designation: "",
@@ -35,9 +40,8 @@ export default function NgoForm({ onBack }) {
     canPickup: false,
 
     // Documents
-    registrationCertificate: null,
-    addressProof: null,
-    authorizationLetter: null,
+    registrationCertificate: "",
+    addressProof: "",
 
     agreeTerms: false,
   })
@@ -80,6 +84,9 @@ export default function NgoForm({ onBack }) {
     }
     if (!formData.phone.trim()) newErrors.phone = "Phone number is required"
     if (!formData.designation.trim()) newErrors.designation = "Designation is required"
+    // validate password
+    if (!formData.password.trim()) newErrors.password = "Password is required"
+    else if (formData.password.length < 8) newErrors.password = "Password must be at least 8 characters long"
 
     // Address validation
     if (!formData.streetAddress.trim()) newErrors.streetAddress = "Street address is required"
@@ -112,28 +119,13 @@ export default function NgoForm({ onBack }) {
 
     setIsSubmitting(true)
     setSubmitError("")
-
-    // Create FormData for file uploads
-    const submitData = new FormData()
-
-    // Add all form fields to FormData
-    Object.entries(formData).forEach(([key, value]) => {
-      if (value !== null) {
-        if (value instanceof File) {
-          submitData.append(key, value)
-        } else if (Array.isArray(value)) {
-          submitData.append(key, JSON.stringify(value))
-        } else {
-          submitData.append(key, String(value))
-        }
-      }
-    })
+    setLoading(true);
 
     try {
       // In a real app, replace with your actual API endpoint
-      const response = await axios.post("https://api.example.com/register/ngo", submitData, {
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND}/auth/register/ngo`, formData, {
         headers: {
-          "Content-Type": "multipart/form-data",
+          "Content-Type": "application/json",
         },
       })
 
@@ -146,7 +138,16 @@ export default function NgoForm({ onBack }) {
       setSubmitError("Registration failed. Please try again later.")
     } finally {
       setIsSubmitting(false)
+      setLoading(false);
     }
+  }
+
+  if(loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader />
+      </div>
+    )
   }
 
   if (submitSuccess) {
@@ -165,12 +166,12 @@ export default function NgoForm({ onBack }) {
         </div>
         <h2 className="text-2xl font-semibold mb-2">Registration Successful!</h2>
         <p className="text-gray-600 mb-6">Your NGO account has been created successfully.</p>
-        <Link
+        <a
           href="/login"
           className="bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-6 rounded-md transition-colors"
         >
           Proceed to Login
-        </Link>
+        </a>
       </div>
     )
   }
@@ -308,6 +309,21 @@ export default function NgoForm({ onBack }) {
                   className={`w-full px-3 py-2 border rounded-md ${errors.email ? "border-red-500" : "border-gray-300"}`}
                 />
                 {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+              </div>
+
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                  Password *
+                </label>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  className={`w-full px-3 py-2 border rounded-md ${errors.password ? "border-red-500" : "border-gray-300"}`}
+                />
+                {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
               </div>
 
               <div>
@@ -459,7 +475,7 @@ export default function NgoForm({ onBack }) {
 
               <div>
                 <label htmlFor="daysAvailable" className="block text-sm font-medium text-gray-700 mb-1">
-                Days Available for Pickup (e.g., Mon-Sat) *
+                  Days Available for Pickup (e.g., Mon-Sat) *
                 </label>
                 <input
                   type="text"
@@ -471,7 +487,7 @@ export default function NgoForm({ onBack }) {
                 />
                 {errors.daysAvailable && <p className="text-red-500 text-xs mt-1">{errors.daysAvailable}</p>}
               </div>
-{/* 
+              {/* 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Days Available for Pickup *</label>
                 <div className="flex flex-wrap gap-2">
@@ -521,70 +537,12 @@ export default function NgoForm({ onBack }) {
           {/* Document Upload */}
           <div>
             <h3 className="text-lg font-medium mb-4">Document Upload</h3>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="registrationCertificate" className="block text-sm font-medium text-gray-700 mb-1">
-                  Registration Certificate (PDF/Image) *
-                </label>
-                <div className="flex items-center mt-1">
-                  <label className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer">
-                    <LuUpload className="mr-2" />
-                    {formData.registrationCertificate ? formData.registrationCertificate.name : "Choose file"}
-                    <input
-                      type="file"
-                      id="registrationCertificate"
-                      name="registrationCertificate"
-                      onChange={handleFileChange}
-                      accept=".pdf,.jpg,.jpeg,.png"
-                      className="sr-only"
-                    />
-                  </label>
-                </div>
-                {errors.registrationCertificate && (
-                  <p className="text-red-500 text-xs mt-1">{errors.registrationCertificate}</p>
-                )}
-              </div>
+              <ImageUpload title={"Registration Certificate (Image) *"} onUpload={(url) => setFormData({ ...formData, registrationCertificate: url })} />
 
-              <div>
-                <label htmlFor="addressProof" className="block text-sm font-medium text-gray-700 mb-1">
-                  Address Proof (PDF/Image) *
-                </label>
-                <div className="flex items-center mt-1">
-                  <label className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer">
-                    <LuUpload className="mr-2" />
-                    {formData.addressProof ? formData.addressProof.name : "Choose file"}
-                    <input
-                      type="file"
-                      id="addressProof"
-                      name="addressProof"
-                      onChange={handleFileChange}
-                      accept=".pdf,.jpg,.jpeg,.png"
-                      className="sr-only"
-                    />
-                  </label>
-                </div>
-                {errors.addressProof && <p className="text-red-500 text-xs mt-1">{errors.addressProof}</p>}
-              </div>
+              <ImageUpload title={"Address Proof (Image) *"} onUpload={(url) => setFormData({ ...formData, addressProof: url })} />
 
-              <div className="md:col-span-2">
-                <label htmlFor="authorizationLetter" className="block text-sm font-medium text-gray-700 mb-1">
-                  Letter of Authorization (if applicable)
-                </label>
-                <div className="flex items-center mt-1">
-                  <label className="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer">
-                    <LuUpload className="mr-2" />
-                    {formData.authorizationLetter ? formData.authorizationLetter.name : "Choose file"}
-                    <input
-                      type="file"
-                      id="authorizationLetter"
-                      name="authorizationLetter"
-                      onChange={handleFileChange}
-                      accept=".pdf,.jpg,.jpeg,.png"
-                      className="sr-only"
-                    />
-                  </label>
-                </div>
-              </div>
             </div>
           </div>
 
