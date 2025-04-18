@@ -80,12 +80,16 @@ export default function DonationsSection() {
       }
       catch (err) {
         console.error("Error fetching accepted donations:", err.message)
-      }
+      } 
+    }
+
+    const fetchBoth = async () => {
+      await fetchAvailableDonations()
+      await fetchAcceptedDonations()
+      setLoading(false)
     }
     
-    fetchAcceptedDonations();
-    fetchAvailableDonations();
-    setLoading(false);
+    fetchBoth();
   } ,[])
 
 
