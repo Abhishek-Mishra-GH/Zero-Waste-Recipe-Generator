@@ -16,7 +16,7 @@ export default function Dashboard() {
     { id: "donate", label: "Donate", icon: <LuHeartHandshake className="w-5 h-5" /> },
     { id: "recipe-generate", label: "Recipe Generator", icon: <LuChefHat className="w-5 h-5" /> },
     { id: "saved-recipe", label: "Saved Recipe", icon: <LuBookmark className="w-5 h-5" /> },
-    { id: "expiry-track", label: "Expiry Track", icon: <LuClock className="w-5 h-5" /> },
+    { id: "expiry-track", label: "Expiry Tracker", icon: <LuClock className="w-5 h-5" /> },
     { id: "meal-plan", label: "Meal Plan", icon: <LuCalendar className="w-5 h-5" /> },
     { id: "notifications", label: "Notifications", icon: <LuBell className="w-5 h-5" /> },
   ]

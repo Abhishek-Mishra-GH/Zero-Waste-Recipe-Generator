@@ -40,18 +40,6 @@ export default function DonateComponent() {
       status: "pending",
       certificate: false,
     },
-    {
-      id: 4,
-      date: "March 15, 2025",
-      organization: "Food Rescue Organization",
-      items: ["Packaged Snacks"],
-      quantity: "1 kg",
-      expiry: "June 15, 2025",
-      location: "101 Elm Road, City",
-      status: "rejected",
-      certificate: false,
-      rejectionReason: "Packaging damaged",
-    },
   ])
   const [loading, setLoading] = useState(false)
 
@@ -183,7 +171,7 @@ export default function DonateComponent() {
     }
   }
 
-  if(loading) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
         <Loader />
@@ -453,14 +441,6 @@ export default function DonateComponent() {
                     )}
 
                     <div className="flex justify-end">
-                      {donation.status === "accepted" && (
-                        <button
-                          onClick={() => setActiveTab("certificate")}
-                          className="text-orange-500 hover:text-orange-600 text-sm font-medium"
-                        >
-                          View Certificate
-                        </button>
-                      )}
 
                       {donation.status === "pending" && (
                         <span className="text-gray-500 text-sm">Awaiting organization response</span>
@@ -491,15 +471,15 @@ export default function DonateComponent() {
                 This certifies that <span className="font-medium">John Doe</span> has donated food items to
                 <span className="font-medium"> Local Food Bank</span> on April 5, 2025.
               </p>
-              <div className="flex items-center text-sm text-gray-500">
+              {/* <div className="flex items-center text-sm text-gray-500">
                 <LuCalendar className="mr-1" /> April 5, 2025
-              </div>
-              <button className="mt-4 text-orange-500 hover:text-orange-600 text-sm font-medium">
+              </div> */}
+              {/* <button className="mt-4 text-orange-500 hover:text-orange-600 text-sm font-medium">
                 Download Certificate
-              </button>
+              </button> */}
             </div>
 
-            <div className="mt-6">
+            {/* <div className="mt-6">
               <h3 className="font-medium mb-2">Your Impact</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
                 <div className="bg-green-50 p-4 rounded-lg">
@@ -515,7 +495,7 @@ export default function DonateComponent() {
                   <p className="text-sm text-gray-600">Meals Provided</p>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
         )}
       </div>

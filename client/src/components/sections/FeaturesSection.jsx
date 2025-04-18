@@ -28,6 +28,12 @@ export default function FeaturesSection() {
 
   const features = [
     {
+      icon: <LuHeartHandshake className="w-12 h-12 text-purple-600" />,
+      title: "Food Donation",
+      description: "Donate excess food to charity organizations",
+      link: "#"
+    },
+    {
       icon: <LuChefHat className="w-12 h-12 text-purple-600" />,
       title: "Recipe Generator",
       description: "Generate recipes from ingredients you already have",
@@ -43,12 +49,6 @@ export default function FeaturesSection() {
       icon: <LuTimer className="w-12 h-12 text-purple-600" />,
       title: "Expiry Tracker",
       description: "Track expiry dates of your groceries to reduce waste",
-      link: "#"
-    },
-    {
-      icon: <LuHeartHandshake className="w-12 h-12 text-purple-600" />,
-      title: "Food Donation",
-      description: "Donate excess food to charity organizations",
       link: "#"
     },
     {
