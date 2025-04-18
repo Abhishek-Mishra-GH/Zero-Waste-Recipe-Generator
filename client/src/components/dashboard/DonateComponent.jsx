@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { LuMapPin, LuCalendar, LuAward, LuPlus, LuImage, LuClock, LuCheck, LuX } from "react-icons/lu"
 import ImageUpload from "../shared/ImageUpload"
 import axios from "axios"
@@ -6,47 +6,15 @@ import Loader from "../shared/Loader"
 
 export default function DonateComponent() {
   const [activeTab, setActiveTab] = useState("donate")
-  const [donationHistory, setDonationHistory] = useState([
-    {
-      id: 1,
-      date: "April 5, 2025",
-      organization: "Local Food Bank",
-      items: ["Canned Goods", "Rice", "Pasta"],
-      quantity: "5 kg",
-      expiry: "April 20, 2025",
-      location: "123 Main Street, City",
-      status: "accepted",
-      certificate: true,
-    },
-    {
-      id: 2,
-      date: "March 20, 2025",
-      organization: "Community Kitchen",
-      items: ["Fresh Vegetables", "Bread"],
-      quantity: "3 kg",
-      expiry: "March 25, 2025",
-      location: "456 Oak Avenue, City",
-      status: "accepted",
-      certificate: true,
-    },
-    {
-      id: 3,
-      date: "April 10, 2025",
-      organization: "Pending Assignment",
-      items: ["Dairy Products", "Eggs"],
-      quantity: "2 kg",
-      expiry: "April 15, 2025",
-      location: "789 Pine Street, City",
-      status: "pending",
-      certificate: false,
-    },
-  ])
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true);
+  const [donationHistory, setDonationHistory] = useState([]);
 
   const [newDonation, setNewDonation] = useState({
     foodItems: "",
     foodCategory: "Non-perishable",
     quantity: "",
+    preparationDate: "",
+    preparationTime: "",
     expiry: "",
     location: "",
     description: "",
@@ -56,6 +24,27 @@ export default function DonateComponent() {
     allergyInfo: "",
     foodImage: "",
   })
+
+  useEffect(() => {
+    const fetchDonationHistory = async () => {
+      try {
+        const url = `${import.meta.env.VITE_BACKEND}/donation`
+        const res = await axios.get(url, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        })
+        setDonationHistory(res.data)
+      } catch (error) {
+        console.error("Error fetching donation history:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchDonationHistory();
+    
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target
@@ -272,6 +261,36 @@ export default function DonateComponent() {
                 </div>
 
                 <div>
+                  <label htmlFor="preparationDate" className="block text-sm font-medium text-gray-700 mb-1">
+                    Preparation Date *
+                  </label>
+                  <input
+                    type="date"
+                    id="preparationDate"
+                    name="preparationDate"
+                    value={newDonation.preparationDate}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="preparationTime" className="block text-sm font-medium text-gray-700 mb-1">
+                    Preparation Time *
+                  </label>
+                  <input
+                    type="time"
+                    id="preparationTime"
+                    name="preparationTime"
+                    value={newDonation.preparationTime}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                    required
+                  />
+                </div>
+
+                <div>
                   <label htmlFor="expiry" className="block text-sm font-medium text-gray-700 mb-1">
                     Expiry Date *
                   </label>
@@ -468,8 +487,8 @@ export default function DonateComponent() {
               </div>
               <h3 className="text-lg font-medium mb-2">Certificate of Appreciation</h3>
               <p className="text-center text-gray-600 mb-4">
-                This certifies that <span className="font-medium">John Doe</span> has donated food items to
-                <span className="font-medium"> Local Food Bank</span> on April 5, 2025.
+                This certifies that <span className="font-medium">you</span> have donated food items to
+                <span className="font-medium"> an NGO or organization.</span>
               </p>
               {/* <div className="flex items-center text-sm text-gray-500">
                 <LuCalendar className="mr-1" /> April 5, 2025

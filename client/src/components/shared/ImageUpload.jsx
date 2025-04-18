@@ -52,6 +52,7 @@ export default function ImageUpload({title, onUpload }) {
                 onChange={(e) => setImage(e.target.files[0])}
                 accept=".pdf,.jpg,.jpeg,.png"
                 className="sr-only"
+                required
               />
             </label>
           </div>

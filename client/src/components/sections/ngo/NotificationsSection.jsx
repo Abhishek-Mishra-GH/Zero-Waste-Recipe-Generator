@@ -6,48 +6,50 @@ import {
 } from "react-icons/lu"
 
 export default function NotificationsSection() {
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
-      type: "donation",
-      title: "New donation available",
-      message: "A new donation has been posted in your area: Fresh Produce (5 kg)",
-      date: "Today, 9:30 AM",
-      read: false,
-    },
-    {
-      id: 2,
-      type: "system",
-      title: "Verification approved",
-      message: "Your NGO verification documents have been approved.",
-      date: "Yesterday, 2:15 PM",
-      read: true,
-    },
-    {
-      id: 3,
-      type: "donor",
-      title: "Donor message",
-      message: "John Doe has sent you a message regarding their donation.",
-      date: "Apr 12, 2025",
-      read: true,
-    },
-    {
-      id: 4,
-      type: "reminder",
-      title: "Pickup reminder",
-      message: "Don't forget to pick up the scheduled donation from Sarah Johnson today at 5:00 PM.",
-      date: "Apr 11, 2025",
-      read: false,
-    },
-    {
-      id: 5,
-      type: "system",
-      title: "Monthly report available",
-      message: "Your monthly impact report for March 2025 is now available.",
-      date: "Apr 5, 2025",
-      read: true,
-    },
-  ])
+  // const [notifications, setNotifications] = useState([
+  //   {
+  //     id: 1,
+  //     type: "donation",
+  //     title: "New donation available",
+  //     message: "A new donation has been posted in your area: Fresh Produce (5 kg)",
+  //     date: "Today, 9:30 AM",
+  //     read: false,
+  //   },
+  //   {
+  //     id: 2,
+  //     type: "system",
+  //     title: "Verification approved",
+  //     message: "Your NGO verification documents have been approved.",
+  //     date: "Yesterday, 2:15 PM",
+  //     read: true,
+  //   },
+  //   {
+  //     id: 3,
+  //     type: "donor",
+  //     title: "Donor message",
+  //     message: "John Doe has sent you a message regarding their donation.",
+  //     date: "Apr 12, 2025",
+  //     read: true,
+  //   },
+  //   {
+  //     id: 4,
+  //     type: "reminder",
+  //     title: "Pickup reminder",
+  //     message: "Don't forget to pick up the scheduled donation from Sarah Johnson today at 5:00 PM.",
+  //     date: "Apr 11, 2025",
+  //     read: false,
+  //   },
+  //   {
+  //     id: 5,
+  //     type: "system",
+  //     title: "Monthly report available",
+  //     message: "Your monthly impact report for March 2025 is now available.",
+  //     date: "Apr 5, 2025",
+  //     read: true,
+  //   },
+  // ])
+
+  const [notifications, setNotifications] = useState([])
 
   const [filter, setFilter] = useState("all")
   const [showSettings, setShowSettings] = useState(false)
@@ -147,23 +149,23 @@ export default function NotificationsSection() {
             >
               Donations
             </button>
-            <button
+            {/* <button
               onClick={() => setFilter("donor")}
               className={`px-4 py-2 rounded-md whitespace-nowrap ${
                 filter === "donor" ? "bg-green-500 text-white" : "bg-gray-100 hover:bg-gray-200"
               }`}
             >
               Donor Messages
-            </button>
+            </button> */}
           </div>
 
           <div className="flex space-x-2">
             <button onClick={markAllAsRead} className="text-green-500 hover:text-green-600 text-sm font-medium">
               Mark all as read
             </button>
-            <button onClick={() => setShowSettings(!showSettings)} className="text-gray-500 hover:text-gray-600">
+            {/* <button onClick={() => setShowSettings(!showSettings)} className="text-gray-500 hover:text-gray-600">
               <LuSettings />
-            </button>
+            </button> */}
           </div>
         </div>
 

@@ -71,33 +71,36 @@ export default function NgoForm({ onBack }) {
     const newErrors = {}
 
     // Organization Information validation
-    if (!formData.ngoName.trim()) newErrors.ngoName = "NGO name is required"
-    if (!formData.ngoType.trim()) newErrors.ngoType = "NGO type is required"
-    if (!formData.registrationNumber.trim()) newErrors.registrationNumber = "Registration number is required"
+    // if (!formData.ngoName.trim()) newErrors.ngoName = "NGO name is required"
+    // if (!formData.ngoType.trim()) newErrors.ngoType = "NGO type is required"
+    // if (!formData.registrationNumber.trim()) newErrors.registrationNumber = "Registration number is required"
 
-    // Authorized Person validation
-    if (!formData.fullName.trim()) newErrors.fullName = "Full name is required"
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required"
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Email is invalid"
-    }
-    if (!formData.phone.trim()) newErrors.phone = "Phone number is required"
-    if (!formData.designation.trim()) newErrors.designation = "Designation is required"
+    // // Authorized Person validation
+    // if (!formData.fullName.trim()) {
+    //   newErrors.fullName = "Full name is required"
+    //   return false;
+    // }
+    // if (!formData.email.trim()) {
+    //   newErrors.email = "Email is required"
+    // } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    //   newErrors.email = "Email is invalid"
+    // }
+    // if (!formData.phone.trim()) newErrors.phone = "Phone number is required"
+    // if (!formData.designation.trim()) newErrors.designation = "Designation is required"
     // validate password
     if (!formData.password.trim()) newErrors.password = "Password is required"
     else if (formData.password.length < 8) newErrors.password = "Password must be at least 8 characters long"
 
     // Address validation
-    if (!formData.streetAddress.trim()) newErrors.streetAddress = "Street address is required"
-    if (!formData.city.trim()) newErrors.city = "City is required"
-    if (!formData.state.trim()) newErrors.state = "State is required"
-    if (!formData.pincode.trim()) newErrors.pincode = "Pincode is required"
+    // if (!formData.streetAddress.trim()) newErrors.streetAddress = "Street address is required"
+    // if (!formData.city.trim()) newErrors.city = "City is required"
+    // if (!formData.state.trim()) newErrors.state = "State is required"
+    // if (!formData.pincode.trim()) newErrors.pincode = "Pincode is required"
 
     // Operational Details validation
-    if (!formData.areasServed.trim()) newErrors.areasServed = "Areas served is required"
-    if (!formData.operatingHours.trim()) newErrors.operatingHours = "Operating hours is required"
-    if (formData.daysAvailable.length === 0) newErrors.daysAvailable = "At least one day must be selected"
+    // if (!formData.areasServed.trim()) newErrors.areasServed = "Areas served is required"
+    // if (!formData.operatingHours.trim()) newErrors.operatingHours = "Operating hours is required"
+    // if (formData.daysAvailable.length === 0) newErrors.daysAvailable = "At least one day must be selected"
 
     // Document validation
     if (!formData.registrationCertificate) newErrors.registrationCertificate = "Registration certificate is required"
@@ -114,11 +117,12 @@ export default function NgoForm({ onBack }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setIsSubmitting(true)
+    setSubmitError("")
+
 
     if (!validateForm()) return
 
-    setIsSubmitting(true)
-    setSubmitError("")
     setLoading(true);
 
     try {
@@ -197,6 +201,7 @@ export default function NgoForm({ onBack }) {
                   NGO Name *
                 </label>
                 <input
+                  required
                   type="text"
                   id="ngoName"
                   name="ngoName"
@@ -212,6 +217,7 @@ export default function NgoForm({ onBack }) {
                   NGO Type *
                 </label>
                 <select
+                  required
                   id="ngoType"
                   name="ngoType"
                   value={formData.ngoType}
@@ -236,6 +242,7 @@ export default function NgoForm({ onBack }) {
                   type="text"
                   id="registrationNumber"
                   name="registrationNumber"
+                  required
                   value={formData.registrationNumber}
                   onChange={handleInputChange}
                   className={`w-full px-3 py-2 border rounded-md ${errors.registrationNumber ? "border-red-500" : "border-gray-300"}`}
@@ -249,6 +256,7 @@ export default function NgoForm({ onBack }) {
                 </label>
                 <input
                   type="number"
+                  required
                   id="yearEstablished"
                   name="yearEstablished"
                   value={formData.yearEstablished}
@@ -287,6 +295,7 @@ export default function NgoForm({ onBack }) {
                 </label>
                 <input
                   type="text"
+                  required
                   id="fullName"
                   name="fullName"
                   value={formData.fullName}
@@ -302,6 +311,7 @@ export default function NgoForm({ onBack }) {
                 </label>
                 <input
                   type="email"
+                  required
                   id="email"
                   name="email"
                   value={formData.email}
@@ -317,6 +327,7 @@ export default function NgoForm({ onBack }) {
                 </label>
                 <input
                   type="password"
+                  required
                   id="password"
                   name="password"
                   value={formData.password}
@@ -332,6 +343,7 @@ export default function NgoForm({ onBack }) {
                 </label>
                 <input
                   type="tel"
+                  required
                   id="phone"
                   name="phone"
                   value={formData.phone}
@@ -361,6 +373,7 @@ export default function NgoForm({ onBack }) {
                 </label>
                 <input
                   type="text"
+                  required
                   id="designation"
                   name="designation"
                   value={formData.designation}
@@ -382,7 +395,8 @@ export default function NgoForm({ onBack }) {
                 </label>
                 <textarea
                   id="streetAddress"
-                  name="streetAddress"
+                  name="streetAddress"  
+                  required
                   rows={2}
                   value={formData.streetAddress}
                   onChange={handleInputChange}
@@ -398,6 +412,7 @@ export default function NgoForm({ onBack }) {
                 <input
                   type="text"
                   id="city"
+                  required
                   name="city"
                   value={formData.city}
                   onChange={handleInputChange}
@@ -412,6 +427,7 @@ export default function NgoForm({ onBack }) {
                 </label>
                 <input
                   type="text"
+                  required
                   id="state"
                   name="state"
                   value={formData.state}
@@ -430,6 +446,7 @@ export default function NgoForm({ onBack }) {
                   id="pincode"
                   name="pincode"
                   value={formData.pincode}
+                  required
                   onChange={handleInputChange}
                   className={`w-full px-3 py-2 border rounded-md ${errors.pincode ? "border-red-500" : "border-gray-300"}`}
                 />
@@ -451,6 +468,7 @@ export default function NgoForm({ onBack }) {
                   name="areasServed"
                   rows={2}
                   value={formData.areasServed}
+                  required
                   onChange={handleInputChange}
                   className={`w-full px-3 py-2 border rounded-md ${errors.areasServed ? "border-red-500" : "border-gray-300"}`}
                   placeholder="E.g., Downtown, North Side, West District"
@@ -464,6 +482,7 @@ export default function NgoForm({ onBack }) {
                 </label>
                 <input
                   type="text"
+                  required
                   id="operatingHours"
                   name="operatingHours"
                   value={formData.operatingHours}
@@ -482,29 +501,12 @@ export default function NgoForm({ onBack }) {
                   id="daysAvailable"
                   name="daysAvailable"
                   value={formData.daysAvailable}
+                  required
                   onChange={handleInputChange}
                   className={`w-full px-3 py-2 border rounded-md ${errors.daysAvailable ? "border-red-500" : "border-gray-300"}`}
                 />
                 {errors.daysAvailable && <p className="text-red-500 text-xs mt-1">{errors.daysAvailable}</p>}
               </div>
-              {/* 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Days Available for Pickup *</label>
-                <div className="flex flex-wrap gap-2">
-                  {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"].map((day) => (
-                    <label key={day} className="inline-flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={formData.daysAvailable.includes(day)}
-                        onChange={() => handleDaysChange(day)}
-                        className="form-checkbox text-orange-500"
-                      />
-                      <span className="ml-2 text-sm">{day}</span>
-                    </label>
-                  ))}
-                </div>
-                {errors.daysAvailable && <p className="text-red-500 text-xs mt-1">{errors.daysAvailable}</p>}
-              </div> */}
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Can You Pick Up Donations? *</label>
@@ -514,6 +516,7 @@ export default function NgoForm({ onBack }) {
                       type="radio"
                       name="canPickup"
                       checked={formData.canPickup}
+                      required
                       onChange={() => setFormData({ ...formData, canPickup: true })}
                       className="form-radio text-orange-500"
                     />
@@ -524,6 +527,7 @@ export default function NgoForm({ onBack }) {
                       type="radio"
                       name="canPickup"
                       checked={!formData.canPickup}
+                      required
                       onChange={() => setFormData({ ...formData, canPickup: false })}
                       className="form-radio text-orange-500"
                     />
@@ -550,6 +554,7 @@ export default function NgoForm({ onBack }) {
           <div className="flex items-start">
             <div className="flex items-center h-5">
               <input
+                required
                 id="agreeTerms"
                 name="agreeTerms"
                 type="checkbox"
@@ -571,7 +576,7 @@ export default function NgoForm({ onBack }) {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="bg-orange-500 hover:bg-orange-600 text-white font-medium py-2 px-6 rounded-md transition-colors flex items-center"
+              className="bg-orange-500 cursor-pointer hover:bg-orange-600 text-white font-medium py-2 px-6 rounded-md transition-colors flex items-center"
             >
               {isSubmitting ? (
                 <>

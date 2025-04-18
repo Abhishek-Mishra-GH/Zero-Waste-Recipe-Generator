@@ -83,18 +83,20 @@ model Donation {
   userId String
   ngoId  String?
 
-  foodItems    String
-  foodCategory String
-  quantity     String
-  expiry       String
-  location     String
-  description  String?
-  contactPhone String
-  pickupTimes  String
-  hasAllergens Boolean @default(false)
-  foodImage    String
-  allergyInfo  String?
-  status       String  @default("pending")
+  foodItems       String
+  foodCategory    String
+  quantity        String
+  expiry          String
+  preparationDate String
+  preparationTime String
+  location        String
+  description     String?
+  contactPhone    String
+  pickupTimes     String
+  hasAllergens    Boolean @default(false)
+  foodImage       String
+  allergyInfo     String?
+  status          String  @default("pending")
 
   createdAt DateTime @default(now())
   ngo       ngo?     @relation(fields: [ngoId], references: [id])

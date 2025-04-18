@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import {
   LuUser,
   LuMapPin,
@@ -10,77 +10,18 @@ import {
   LuInfo,
 } from "react-icons/lu"
 
+import axios from 'axios'
+import Loader from "../../shared/Loader"
+
 
 // Donations Section Component
 export default function DonationsSection() {
   const [activeTab, setActiveTab] = useState("available")
   const [showFilters, setShowFilters] = useState(false)
   const [selectedDonation, setSelectedDonation] = useState(null)
+  const [loading, setLoading] = useState(true);
 
-  const [filters, setFilters] = useState({
-    foodType: "all",
-    distance: "all",
-    expiryTime: "all",
-  })
-
-  const [availableDonations, setAvailableDonations] = useState([
-    {
-      id: 1,
-      donorName: "John Doe",
-      foodType: "Fresh Produce",
-      items: ["Apples", "Carrots", "Potatoes"],
-      quantity: "5 kg",
-      expiry: "April 18, 2025",
-      location: "123 Main St, Cityville",
-      distance: "2.3 miles",
-      postedDate: "April 12, 2025",
-      contactPhone: "+1 (555) 123-4567",
-      pickupTimes: "Weekdays 5-8 PM, Weekends 10 AM-6 PM",
-      notes: "All items are organic and freshly harvested yesterday.",
-    },
-    {
-      id: 2,
-      donorName: "Sarah Johnson",
-      foodType: "Bakery",
-      items: ["Bread", "Pastries"],
-      quantity: "10 items",
-      expiry: "April 15, 2025",
-      location: "456 Oak Ave, Townsville",
-      distance: "4.1 miles",
-      postedDate: "April 11, 2025",
-      contactPhone: "+1 (555) 987-6543",
-      pickupTimes: "Daily 6-9 PM",
-      notes: "From local bakery, unsold items from today.",
-    },
-    {
-      id: 3,
-      donorName: "Michael Brown",
-      foodType: "Non-perishable",
-      items: ["Canned Soup", "Rice", "Pasta"],
-      quantity: "8 kg",
-      expiry: "July 20, 2025",
-      location: "789 Pine Rd, Villagetown",
-      distance: "1.5 miles",
-      postedDate: "April 10, 2025",
-      contactPhone: "+1 (555) 456-7890",
-      pickupTimes: "Weekends only, 9 AM-5 PM",
-      notes: "All items unopened and within expiration date.",
-    },
-    {
-      id: 4,
-      donorName: "Emily Wilson",
-      foodType: "Dairy",
-      items: ["Milk", "Yogurt", "Cheese"],
-      quantity: "3 kg",
-      expiry: "April 16, 2025",
-      location: "101 Elm St, Hamletville",
-      distance: "3.7 miles",
-      postedDate: "April 12, 2025",
-      contactPhone: "+1 (555) 234-5678",
-      pickupTimes: "Today or tomorrow, 4-8 PM",
-      notes: "Need to be picked up soon due to short expiry.",
-    },
-  ])
+  const [availableDonations, setAvailableDonations] = useState([])
 
   const [acceptedDonations, setAcceptedDonations] = useState([
     {
@@ -113,6 +54,41 @@ export default function DonationsSection() {
     },
   ])
 
+  useEffect(() => {
+    const fetchAvailableDonations = async () => {
+      const url = `${import.meta.env.VITE_BACKEND}/donation/pending`
+      
+      try {
+        const resp = await axios.get(url)
+        setAvailableDonations(resp.data);
+      } catch (err) {
+        console.error("Error fetching user data:", err);
+      } 
+    } 
+
+    // fetch accepted donations
+    const fetchAcceptedDonations = async () => {
+      const url = `${import.meta.env.VITE_BACKEND}/donation/accepted`
+      const token = localStorage.getItem("token")
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      }
+
+      try {
+        const resp = await axios.get(url, { headers })
+        setAcceptedDonations(resp.data)
+      }
+      catch (err) {
+        console.error("Error fetching accepted donations:", err.message)
+      }
+    }
+    
+    fetchAcceptedDonations();
+    fetchAvailableDonations();
+    setLoading(false);
+  } ,[])
+
+
   const handleFilterChange = (name, value) => {
     setFilters({
       ...filters,
@@ -120,12 +96,9 @@ export default function DonationsSection() {
     })
   }
 
-  const toggleFilters = () => {
-    setShowFilters(!showFilters)
-  }
-
-  const handleAcceptDonation = (donation) => {
+  const handleAcceptDonation = async (donation) => {
     // Remove from available donations
+    setLoading(true)
     setAvailableDonations(availableDonations.filter((item) => item.id !== donation.id))
 
     // Add to accepted donations with additional fields
@@ -137,7 +110,24 @@ export default function DonationsSection() {
       status: "pending",
     }
 
-    setAcceptedDonations([acceptedDonation, ...acceptedDonations])
+    // send put req to server
+    const url = `${import.meta.env.VITE_BACKEND}/donation/accept/${donation.id}`
+    
+    try {
+      // send put req to server with jwt token, donantion id is passed as param
+      const token = localStorage.getItem("token")
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      }
+      const resp = await axios.put(url, {}, { headers })
+
+      setAcceptedDonations([acceptedDonation, ...acceptedDonations])
+      window.location.reload();
+    } catch (err) {
+      console.error("Error accepting donation:", err.message)
+    } finally {
+      setLoading(false)
+    }
 
     // Close donation details if open
     setSelectedDonation(null)
@@ -171,57 +161,63 @@ export default function DonationsSection() {
     setAcceptedDonations(updatedDonations)
   }
 
+
   const getStatusBadge = (status) => {
     switch (status) {
       case "pending":
         return (
           <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full flex items-center">
-            <LuClock className="mr-1" /> Pending Pickup
+            Pending
           </span>
         )
-      case "scheduled":
-        return (
-          <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full flex items-center">
-            <LuCalendar className="mr-1" /> Pickup Scheduled
-          </span>
-        )
-      case "completed":
+      case "accepted":
         return (
           <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full flex items-center">
-            <LuCheck className="mr-1" /> Completed
+            <LuCheck className="mr-1" /> Accepted
           </span>
         )
       default:
-        return null
+        return (
+          <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full flex items-center">
+            Pending
+          </span>
+        )
     }
   }
 
-  const filteredAvailableDonations = availableDonations.filter((donation) => {
-    if (filters.foodType !== "all" && donation.foodType !== filters.foodType) return false
+  // const filteredAvailableDonations = availableDonations.filter((donation) => {
+  //   if (filters.foodType !== "all" && donation.foodType !== filters.foodType) return false
 
-    // Distance filtering logic would go here in a real app
-    if (filters.distance !== "all") {
-      const distanceNum = Number.parseFloat(donation.distance)
-      if (filters.distance === "under5" && distanceNum >= 5) return false
-      if (filters.distance === "under10" && distanceNum >= 10) return false
-      if (filters.distance === "under20" && distanceNum >= 20) return false
-    }
+  //   // Distance filtering logic would go here in a real app
+  //   if (filters.distance !== "all") {
+  //     const distanceNum = Number.parseFloat(donation.distance)
+  //     if (filters.distance === "under5" && distanceNum >= 5) return false
+  //     if (filters.distance === "under10" && distanceNum >= 10) return false
+  //     if (filters.distance === "under20" && distanceNum >= 20) return false
+  //   }
 
-    // Expiry filtering logic
-    if (filters.expiryTime !== "all") {
-      const today = new Date()
-      const expiryDate = new Date(donation.expiry)
-      const diffTime = expiryDate - today
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+  //   // Expiry filtering logic
+  //   if (filters.expiryTime !== "all") {
+  //     const today = new Date()
+  //     const expiryDate = new Date(donation.expiry)
+  //     const diffTime = expiryDate - today
+  //     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
 
-      if (filters.expiryTime === "today" && diffDays !== 0) return false
-      if (filters.expiryTime === "tomorrow" && diffDays !== 1) return false
-      if (filters.expiryTime === "thisWeek" && (diffDays < 0 || diffDays > 7)) return false
-    }
+  //     if (filters.expiryTime === "today" && diffDays !== 0) return false
+  //     if (filters.expiryTime === "tomorrow" && diffDays !== 1) return false
+  //     if (filters.expiryTime === "thisWeek" && (diffDays < 0 || diffDays > 7)) return false
+  //   }
 
-    return true
-  })
+  //   return true
+  // })
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader />
+      </div>
+    )
+  }
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6">Donations</h1>
@@ -245,13 +241,13 @@ export default function DonationsSection() {
         {activeTab === "available" && (
           <div className="p-4">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-medium">Available Donations in Your Area</h2>
-              <button
+              <h2 className="text-lg font-medium">Available Donations</h2>
+              {/* <button
                 onClick={toggleFilters}
                 className="flex items-center text-sm bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-md"
               >
                 <LuFilter className="mr-1" /> Filter
-              </button>
+              </button> */}
             </div>
 
             {showFilters && (
@@ -273,19 +269,6 @@ export default function DonationsSection() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Distance</label>
-                    <select
-                      value={filters.distance}
-                      onChange={(e) => handleFilterChange("distance", e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md"
-                    >
-                      <option value="all">Any Distance</option>
-                      <option value="under5">Under 5 miles</option>
-                      <option value="under10">Under 10 miles</option>
-                      <option value="under20">Under 20 miles</option>
-                    </select>
-                  </div>
-                  <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Expiry Time</label>
                     <select
                       value={filters.expiryTime}
@@ -302,9 +285,9 @@ export default function DonationsSection() {
               </div>
             )}
 
-            {filteredAvailableDonations.length > 0 ? (
+            {availableDonations.length > 0 ? (
               <div className="space-y-4">
-                {filteredAvailableDonations.map((donation) => (
+                {availableDonations.map((donation) => (
                   <div
                     key={donation.id}
                     className={`border rounded-lg overflow-hidden ${selectedDonation?.id === donation.id ? "border-green-500" : "border-gray-200"}`}
@@ -326,7 +309,7 @@ export default function DonationsSection() {
                       <div className="mt-3 flex flex-wrap gap-y-2">
                         <div className="w-full sm:w-1/2 flex items-center text-sm text-gray-500">
                           <LuMapPin className="mr-1" />
-                          <span>{donation.distance} away</span>
+                          <span>{donation.location} </span>
                         </div>
                         <div className="w-full sm:w-1/2 flex items-center text-sm text-gray-500">
                           <LuCalendar className="mr-1" />
@@ -373,10 +356,16 @@ export default function DonationsSection() {
                           </div>
                         )}
 
+                        <div>
+                          {/* add image donation.image */}
+                          <p>Attached Image:</p>
+                          <img src={donation.image} alt="Donation" className="h-32 object-contain rounded-md mb-4" />
+                        </div>
+
                         <div className="flex justify-end">
                           <button
                             onClick={() => handleAcceptDonation(donation)}
-                            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition-colors"
+                            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md transition-colors cursor-pointer"
                           >
                             Accept Donation
                           </button>
@@ -438,34 +427,10 @@ export default function DonationsSection() {
                             <span>{donation.location}</span>
                           </div>
                         </div>
-                        <div>
+                        {/* <div>
                           <p className="text-xs text-gray-500">Pickup Schedule</p>
-                          <p className="text-sm">{donation.pickupScheduled}</p>
-                        </div>
-                      </div>
-
-                      <div className="flex justify-end space-x-3">
-                        {donation.status === "pending" && (
-                          <button
-                            onClick={() => handleSchedulePickup(donation.id)}
-                            className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 text-sm rounded-md transition-colors"
-                          >
-                            Schedule Pickup
-                          </button>
-                        )}
-
-                        {donation.status === "scheduled" && (
-                          <button
-                            onClick={() => handleMarkComplete(donation.id)}
-                            className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 text-sm rounded-md transition-colors"
-                          >
-                            Mark as Completed
-                          </button>
-                        )}
-
-                        <button className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 text-sm rounded-md transition-colors">
-                          Contact Donor
-                        </button>
+                          <p className="text-sm">{donation.pi}</p>
+                        </div> */}
                       </div>
                     </div>
                   </div>

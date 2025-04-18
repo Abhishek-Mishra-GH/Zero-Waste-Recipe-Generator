@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import {
   LuSave,
   LuMapPin,
@@ -6,10 +6,12 @@ import {
   LuMail,
   LuGlobe,
 } from "react-icons/lu"
-
+import Loader from "../../shared/Loader"
+import axios from "axios"
 
 // Account Section Component
 export default function AccountSection() {
+  const [loading, setLoading] = useState(true)
   const [ngoData, setNgoData] = useState({
     name: "Community Food Bank",
     registrationNumber: "NGO12345678",
@@ -22,11 +24,33 @@ export default function AccountSection() {
     contactRole: "Program Director",
     transportAvailable: true,
     coldStorageAvailable: true,
-    logo: "/placeholder.svg?height=150&width=150&text=NGO+Logo",
+    numberOfAcceptedDonations: 0,
   })
 
   const [isEditing, setIsEditing] = useState(false)
   const [editedData, setEditedData] = useState({ ...ngoData })
+
+  useEffect(() => {
+    const fetchNgoData = async () => {
+
+      try {
+        const url = `${import.meta.env.VITE_BACKEND}/ngo`
+        const response = await axios.get(url, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        })
+        setNgoData(response.data)
+        setEditedData(response.data)
+      } catch (error) {
+        console.error("Error fetching NGO data:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchNgoData()
+  }, []);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
@@ -42,18 +66,17 @@ export default function AccountSection() {
   }
 
   const stats = [
-    { label: "Donations Received", value: 28 },
-    { label: "Pending Donations", value: 12 },
-    { label: "People Served", value: 450 },
-    { label: "Food Saved (kg)", value: 320 },
+    { label: "Donations Accepted", value: ngoData.numberOfAcceptedDonations },
+
   ]
 
-  // const recentActivity = [
-  //   { type: "donation_accepted", message: "You accepted a donation from John Doe", time: "2 hours ago" },
-  //   { type: "donation_completed", message: "Donation pickup completed from Sarah Johnson", time: "Yesterday" },
-  //   { type: "new_donation", message: "New donation available in your area", time: "2 days ago" },
-  //   { type: "system", message: "Monthly impact report is now available", time: "1 week ago" },
-  // ]
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader />
+      </div>
+    )
+  }
 
   return (
     <div>

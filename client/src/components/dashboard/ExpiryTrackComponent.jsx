@@ -12,14 +12,6 @@ export default function ExpiryTrackComponent() {
       daysLeft: 3,
     },
     {
-      id: 2,
-      name: "Chicken Breast",
-      category: "Meat",
-      purchaseDate: "2025-04-07",
-      expiryDate: "2025-04-10",
-      daysLeft: 1,
-    },
-    {
       id: 3,
       name: "Spinach",
       category: "Vegetables",

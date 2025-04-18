@@ -94,22 +94,6 @@ export default function NGODashboard() {
               <li>
                 <button
                   onClick={() => {
-                    setActiveSection("donors")
-                    setIsMobileMenuOpen(false)
-                  }}
-                  className={`flex items-center w-full px-4 py-3 text-left text-gray-700 hover:bg-gray-300 transition-colors ${
-                    activeSection === "donors" ? "bg-green-500 text-white hover:bg-green-600" : ""
-                  }`}
-                >
-                  <span className="mr-3">
-                    <LuUsers className="w-5 h-5" />
-                  </span>
-                  Donors
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => {
                     setActiveSection("donations")
                     setIsMobileMenuOpen(false)
                   }}
@@ -121,6 +105,22 @@ export default function NGODashboard() {
                     <LuList className="w-5 h-5" />
                   </span>
                   Donation List
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() => {
+                    setActiveSection("donors")
+                    setIsMobileMenuOpen(false)
+                  }}
+                  className={`flex items-center w-full px-4 py-3 text-left text-gray-700 hover:bg-gray-300 transition-colors ${
+                    activeSection === "donors" ? "bg-green-500 text-white hover:bg-green-600" : ""
+                  }`}
+                >
+                  <span className="mr-3">
+                    <LuUsers className="w-5 h-5" />
+                  </span>
+                  Donors
                 </button>
               </li>
               <li>
