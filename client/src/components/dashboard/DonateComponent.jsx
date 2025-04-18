@@ -3,6 +3,7 @@ import { LuMapPin, LuCalendar, LuAward, LuPlus, LuImage, LuClock, LuCheck, LuX }
 import ImageUpload from "../shared/ImageUpload"
 import axios from "axios"
 import Loader from "../shared/Loader"
+import DonationMap from "../elements/DonationMap"
 
 export default function DonateComponent() {
   const [activeTab, setActiveTab] = useState("donate")
@@ -517,6 +518,10 @@ export default function DonateComponent() {
             </div> */}
           </div>
         )}
+      </div>
+
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <DonationMap />
       </div>
 
       <div className="bg-white rounded-lg shadow-md p-6">

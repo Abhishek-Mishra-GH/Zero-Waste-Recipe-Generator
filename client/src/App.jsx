@@ -6,6 +6,8 @@ import LoginPage from "./pages/LoginPage"
 import Dashboard from "./pages/Dashboard"
 import RegisterPage from "./pages/RegisterPage"
 import NGODashboard from "./pages/NgoDashboard"
+import 'leaflet/dist/leaflet.css';
+
 
 function App() {
 
