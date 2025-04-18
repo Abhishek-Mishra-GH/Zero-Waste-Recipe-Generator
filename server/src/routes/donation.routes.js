@@ -4,6 +4,20 @@ const prisma = require("../../prisma/client");
 const authenticateToken = require("../middlewares/auth.middleware");
 const { format } = require("date-fns");
 
+function formatDate(date) {
+  return new Date(date).toLocaleDateString('en-US', {
+    year: 'numeric', month: 'long', day: 'numeric',
+  });
+}
+
+function getInitials(name) {
+  return name
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase();
+}
+
 router.post("/", authenticateToken, async (req, res) => {
   const userId = req.user.id;
   const donation = req.body;
@@ -73,7 +87,7 @@ router.get("/accepted", authenticateToken, async (req, res) => {
           },
         },
       },
-      
+
       orderBy: { createdAt: "desc" },
     });
 
@@ -95,6 +109,65 @@ router.get("/accepted", authenticateToken, async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "Failed to fetch donations" });
+  }
+});
+
+router.get("/donorswithngo", authenticateToken, async (req, res) => {
+  const ngoId = req.user.id;
+
+  try {
+    const donations = await prisma.donation.findMany({
+      where: {
+        ngoId: ngoId,
+      },
+      include: {
+        user: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    const donorsMap = new Map();
+    for (const donation of donations) {
+      const { user, createdAt, foodItems, quantity, status } = donation;
+
+      if (!donorsMap.has(user.id)) {
+        donorsMap.set(user.id, {
+          id: user.id,
+          name: user.fullName,
+          avatar: `/placeholder.svg?height=100&width=100&text=${getInitials(
+            user.fullName
+          )}`,
+          location: user.address,
+          phone: user.phone,
+          email: user.email,
+          donationCount: 0,
+          lastDonation: null,
+          donationHistory: [],
+        });
+      }
+
+      const donor = donorsMap.get(user.id);
+      donor.donationCount += 1;
+      donor.donationHistory.push({
+        date: formatDate(createdAt),
+        items: foodItems.split(",").map((item) => item.trim()),
+        quantity,
+        status,
+      });
+
+      if (!donor.lastDonation) {
+        donor.lastDonation = formatDate(createdAt);
+      }
+    }
+
+    const formattedDonorsData =  Array.from(donorsMap.values());
+
+    res.status(200).json(formattedDonorsData);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to fetch donations" });
   }
 });
 

@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import {
   LuMapPin,
   LuPhone,
@@ -7,68 +7,34 @@ import {
   LuSearch,
 } from "react-icons/lu"
 
+import Loader from "../../shared/Loader"
+import axios from "axios"
+
 export default function DonorsSection() {
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedDonor, setSelectedDonor] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [donors, setDonors] = useState([]);
+  
+  useEffect(() => {
+    const fetchDonors = async () => {
+      try {
+        const url = `${import.meta.env.VITE_BACKEND}/donation/donorswithngo`
+        const response = await axios.get(url, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        })
+        setDonors(response.data)
+      } catch (error) {
+        console.error("Error fetching donors:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
 
-  const donors = [
-    {
-      id: 1,
-      name: "John Doe",
-      avatar: "/placeholder.svg?height=100&width=100&text=JD",
-      location: "123 Main St, Cityville",
-      phone: "+1 (555) 123-4567",
-      email: "john.doe@example.com",
-      donationCount: 5,
-      lastDonation: "April 10, 2025",
-      donationHistory: [
-        { date: "April 10, 2025", items: ["Apples", "Carrots", "Potatoes"], quantity: "5 kg", status: "completed" },
-        { date: "March 15, 2025", items: ["Rice", "Pasta", "Canned Beans"], quantity: "3 kg", status: "completed" },
-        { date: "February 22, 2025", items: ["Bread", "Milk"], quantity: "2 kg", status: "completed" },
-      ],
-    },
-    {
-      id: 2,
-      name: "Sarah Johnson",
-      avatar: "/placeholder.svg?height=100&width=100&text=SJ",
-      location: "456 Oak Ave, Townsville",
-      phone: "+1 (555) 987-6543",
-      email: "sarah.johnson@example.com",
-      donationCount: 3,
-      lastDonation: "April 11, 2025",
-      donationHistory: [
-        { date: "April 11, 2025", items: ["Bread", "Pastries"], quantity: "10 items", status: "completed" },
-        { date: "March 20, 2025", items: ["Vegetables", "Fruits"], quantity: "4 kg", status: "completed" },
-      ],
-    },
-    {
-      id: 3,
-      name: "Michael Brown",
-      avatar: "/placeholder.svg?height=100&width=100&text=MB",
-      location: "789 Pine Rd, Villagetown",
-      phone: "+1 (555) 456-7890",
-      email: "michael.brown@example.com",
-      donationCount: 1,
-      lastDonation: "April 10, 2025",
-      donationHistory: [
-        { date: "April 10, 2025", items: ["Canned Soup", "Rice", "Pasta"], quantity: "8 kg", status: "completed" },
-      ],
-    },
-    {
-      id: 4,
-      name: "Emily Wilson",
-      avatar: "/placeholder.svg?height=100&width=100&text=EW",
-      location: "101 Elm St, Hamletville",
-      phone: "+1 (555) 234-5678",
-      email: "emily.wilson@example.com",
-      donationCount: 2,
-      lastDonation: "April 12, 2025",
-      donationHistory: [
-        { date: "April 12, 2025", items: ["Milk", "Yogurt", "Cheese"], quantity: "3 kg", status: "pending" },
-        { date: "March 5, 2025", items: ["Bread", "Eggs"], quantity: "2 kg", status: "completed" },
-      ],
-    },
-  ]
+    fetchDonors()
+  }, [])
 
   const filteredDonors = donors.filter(
     (donor) =>
@@ -76,6 +42,14 @@ export default function DonorsSection() {
       donor.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       donor.location.toLowerCase().includes(searchTerm.toLowerCase()),
   )
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader />
+      </div>
+    )
+  }
 
   return (
     <div>
