@@ -149,7 +149,7 @@ export default function DonorsSection() {
                             : "bg-yellow-100 text-yellow-800"
                         }`}
                       >
-                        {donation.status === "completed" ? "Completed" : "Pending"}
+                        {donation.status === "pending" ? "Pending" : "Accepted"}
                       </span>
                     </div>
                     <div className="flex items-center text-xs text-gray-500">
