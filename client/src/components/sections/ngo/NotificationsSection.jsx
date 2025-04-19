@@ -49,7 +49,15 @@ export default function NotificationsSection() {
   //   },
   // ])
 
-  const [notifications, setNotifications] = useState([])
+  
+  const [notifications, setNotifications] = useState([    {
+    id: 1,
+    type: "donation",
+    title: "New donation available",
+    message: "A new donation has been posted please check your dashboard for more details.",
+    date: "Today, 9:30 AM",
+    read: false,
+  },])
 
   const [filter, setFilter] = useState("all")
   const [showSettings, setShowSettings] = useState(false)
@@ -183,7 +191,6 @@ export default function NotificationsSection() {
                       <h3 className={`font-medium ${!notification.read ? "text-green-800" : ""}`}>
                         {notification.title}
                       </h3>
-                      <span className="text-xs text-gray-500">{notification.date}</span>
                     </div>
                     <p className="text-gray-600 mt-1">{notification.message}</p>
 
