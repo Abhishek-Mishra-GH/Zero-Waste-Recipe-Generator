@@ -3,18 +3,22 @@ const router = express.Router();
 const prisma = require("../../prisma/client");
 const authenticateToken = require("../middlewares/auth.middleware");
 const { format } = require("date-fns");
+const sendAllNGO = require("../utils/mail/sendAllNGO");
+const sendEmail = require("../utils/mail/sendEmail");
 
 function formatDate(date) {
-  return new Date(date).toLocaleDateString('en-US', {
-    year: 'numeric', month: 'long', day: 'numeric',
+  return new Date(date).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
 }
 
 function getInitials(name) {
   return name
-    .split(' ')
+    .split(" ")
     .map((n) => n[0])
-    .join('')
+    .join("")
     .toUpperCase();
 }
 
@@ -29,6 +33,12 @@ router.post("/", authenticateToken, async (req, res) => {
         ...donation,
       },
     });
+
+    // Send email to all NGOs asynchronously
+    sendAllNGO().catch((error) => {
+      console.error("Error sending emails to NGOs:", error);
+    });
+
     res.status(201).json({ message: "Donation saved successfully" });
   } catch (error) {
     console.error(error);
@@ -45,7 +55,14 @@ router.put("/accept/:donationid", authenticateToken, async (req, res) => {
 
   const donation = await prisma.donation.findUnique({
     where: { id: donationId },
-    select: { status: true },
+    select: {
+      status: true,
+      user: {
+        select: {
+          email: true,
+        },
+      },
+    },
   });
 
   if (!donation) {
@@ -64,6 +81,12 @@ router.put("/accept/:donationid", authenticateToken, async (req, res) => {
         ngoId,
       },
     });
+
+    const donorEmail = donation.user.email;
+    const subject = "Donation Accepted";
+    const message = `Your donation has been accepted by an NGO. Thank you for your generosity!, check your dashboard for more details.`;
+    sendEmail(donorEmail, subject, message);
+
     res.status(200).json({ message: "Donation accepted successfully" });
   } catch (error) {
     console.error(error);
@@ -162,7 +185,7 @@ router.get("/donorswithngo", authenticateToken, async (req, res) => {
       }
     }
 
-    const formattedDonorsData =  Array.from(donorsMap.values());
+    const formattedDonorsData = Array.from(donorsMap.values());
 
     res.status(200).json(formattedDonorsData);
   } catch (error) {
